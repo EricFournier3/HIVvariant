@@ -24,30 +24,71 @@ parser = argparse.ArgumentParser(prog="GP120VariantComputer",formatter_class=arg
             '''))
 
 
+#TODO ajouter / dans les path des base dir , confirmer le besoin dans le code
+
+parser.add_argument('--basedir',metavar='[Required : Path to base directory]',required=True,nargs=1)
+
+parser.add_argument('--global-align-in',type=argparse.FileType('r'),metavar='[Required : Path to global alignement]',required=True,nargs=1,dest='globalalignin')
+
+parser.add_argument('--yaml-spec-in',type=argparse.FileType('r'),metavar='[Required : Path to yaml with specimens id]',required=True,nargs=1,dest='yamlspecin')
+
+parser.add_argument('--smalt-bin',nargs=1,type=str,metavar='[Required : Path to Smalt executable]',required=True,dest='smaltbin')
+
+parser.add_argument('--fastq-1',nargs=1,type=str,metavar='Required : Base directory for first set of fastq]',required=True,dest='fastq1')
+
+#Optional
+parser.add_argument('--fastq-2',nargs=1,type=str,metavar='[Optional : Base directory for second optional set of fastq]',required=False,dest='fastq2')
+
+
+###########################################################################################################################
+
 #Write mode
-parser.add_argument('--statfile-out',type=str,metavar='[Output file for statistic]',required=True,nargs=1,dest='statfileout')
-parser.add_argument('--nspec-region-out',type=argparse.FileType('w'),metavar='[Output file for number of specimen per region]',required=True,nargs=1,dest='nspecregionout')
-parser.add_argument('--seq-align-out',type=argparse.FileType('w'),metavar='[Output fasta file for diversity calculation]',required=True,nargs=1,dest='seqalignout')
-parser.add_argument('--diversity-error-out',type=argparse.FileType('w'),metavar='[Output file to log diversity calculation error]',required=True,nargs=1,dest='diversityerrorout')
+#no need
+#parser.add_argument('--statfile-out',type=str,metavar='[Output file for statistic]',required=True,nargs=1,dest='statfileout')
+
+#no need
+#parser.add_argument('--nspec-region-out',type=argparse.FileType('w'),metavar='[Output file for number of specimen per region]',required=True,nargs=1,dest='nspecregionout')
+
+#no need
+#parser.add_argument('--seq-align-out',type=argparse.FileType('w'),metavar='[Output fasta file for diversity calculation]',required=True,nargs=1,dest='seqalignout')
+#parser.add_argument('--diversity-error-out',type=argparse.FileType('w'),metavar='[Output file to log diversity calculation error]',required=True,nargs=1,dest='diversityerrorout')
 
 #Read mode
-parser.add_argument('--diversity-script-in',type=argparse.FileType('r'),metavar='[Path to ComputeDiversity.R]',required=True,nargs=1,dest='diversityscriptin')
-parser.add_argument('--global-align-in',type=argparse.FileType('r'),metavar='[Path to global alignement]',required=True,nargs=1,dest='globalalignin')
-parser.add_argument('--yaml-spec-in',type=argparse.FileType('r'),metavar='[Path to yaml with specimens id]',required=True,nargs=1,dest='yamlspecin')
+
+#no need
+#parser.add_argument('--diversity-script-in',type=argparse.FileType('r'),metavar='[Path to ComputeDiversity.R]',required=True,nargs=1,dest='diversityscriptin')
+
+#need
+#parser.add_argument('--global-align-in',type=argparse.FileType('r'),metavar='[Path to global alignement]',required=True,nargs=1,dest='globalalignin')
+
+#need
+#parser.add_argument('--yaml-spec-in',type=argparse.FileType('r'),metavar='[Path to yaml with specimens id]',required=True,nargs=1,dest='yamlspecin')
 
 #Base directory
-parser.add_argument('--smalt-bin',nargs=1,type=str,metavar='[Path to Smalt executable]',required=True,dest='smaltbin')
-parser.add_argument('--fastq-1',nargs=1,type=str,metavar='[Base directory for first set of fastq]',required=True,dest='fastq1')
-parser.add_argument('--fastq-2',nargs=1,type=str,metavar='[Base directory for second set of fastq]',required=True,dest='fastq2')
-parser.add_argument('--gp120-fasta',nargs=1,type=str,metavar='[Base directory for gp120 fasta contig file]',required=True,dest='gp120fasta')
-parser.add_argument('--smalt-out',nargs=1,type=str,metavar='[Base directory for smalt bam and sam output file]',dest='smaltout')
-parser.add_argument('--seq-align-error-out',type=str,metavar='[Base directory to save fasta alignment files with diversity calculation error]',required=True,nargs=1,dest='seqalignerrorout')
+
+#need
+#parser.add_argument('--smalt-bin',nargs=1,type=str,metavar='[Path to Smalt executable]',required=True,dest='smaltbin')
+
+
+#need
+#parser.add_argument('--fastq-1',nargs=1,type=str,metavar='[Base directory for first set of fastq]',required=True,dest='fastq1')
+
+#need
+#parser.add_argument('--fastq-2',nargs=1,type=str,metavar='[Base directory for second set of fastq]',required=True,dest='fastq2')
+
+#no need
+#parser.add_argument('--gp120-fasta',nargs=1,type=str,metavar='[Base directory for gp120 fasta contig file]',required=True,dest='gp120fasta')
+
+#no need
+#parser.add_argument('--smalt-out',nargs=1,type=str,metavar='[Base directory for smalt bam and sam output file]',dest='smaltout')
+
+#no need
+#parser.add_argument('--seq-align-error-out',type=str,metavar='[Base directory to save fasta alignment files with diversity calculation error]',required=True,nargs=1,dest='seqalignerrorout')
 
 
 args=parser.parse_args()
 
 
-#TODO FAIRE UN  README
 #TODO SUPPRIMER LES PATH COMMENTé mais faire un check in avant
 
 class PathManager():
@@ -55,23 +96,91 @@ class PathManager():
     Manage all path in this script
     """
 
-    statfile_out = args.statfileout[0]
-    nspec_region_out = args.nspecregionout[0]
-    seq_align_out = args.seqalignout[0]
-    diversity_error_out = diversityerrorout[0]
-    seq_align_error_out = seqalignerrorout[0]
-    diversity_script_in = diversityscriptin[0]
-    global_align_in = globalalignin[0]
-    yaml_spec_in = yamlspecin[0]
-    smalt_bin = smaltbin[0]
-    fastq_1 = fastq1[0]
-    fastq_2 = fastq2[0]
-    gp120_fasta = gp120fasta[0]
-    smalt_out = smaltout[0]
+    def __init__(self):
+
+        #Path to base directory
+        self.basedir = args.basedir[0]
+        print 'basedir ' + self.basedir
+
+        #Path to the global alignment file
+        self.global_align_in = args.globalalignin[0]
+
+        #Path to the yaml file with specimens list
+        self.yaml_spec_in = args.yamlspecin[0]
+
+        #Path to the smalt executable
+        self.smalt_bin = args.smaltbin[0]
+
+        #Path to fastq files
+        if not args.fastq1[0].endswith('/'):
+            self.fastq_1 = args.fastq1[0] + '/'
+        else:
+            self.fastq_1 = args.fastq1[0]
+
+        print 'fastq_1 ' + self.fastq_1
+
+        #Path second set set of fastq files if applicable
+        try:
+            if not args.fastq2[0].endswith('/'):
+               self.fastq_2 = args.fastq2[0] + '/'
+            else:
+                self.fastq_2 = args.fastq2[0]
+
+        except:
+            self.fastq_2 = None
+        print 'fastq_2 ' + str(self.fastq_2)
 
 
-#Start the program
-my_wa=WindowAnalyser()
+    def BuildWorkDir(self):
+        """
+        Build the working directory with all needed sub directories
+        and files
+        :return:
+        """
+
+        try:
+            if not self.basedir.endswith('/'):
+                self.basedir = self.basedir + '/'
+
+            #Path to working directory
+            self.work_dir = self.basedir + 'VariantAnalysis/'
+
+            #Path to input directory
+            self.input_dir = self.work_dir + 'Input/'
+
+            #Path to output directory
+            self.output_dir = self.work_dir + 'Output/'
+
+            #Path to error directory files
+            self.error_dir = self.work_dir + 'ErrorLog/'
+
+            #Path to smalt output
+            self.smalt_out_dir = self.work_dir + 'SmaltOutput/'
+
+            #Path to fasta alignement pour diversity calculation
+            self.diversity_align_dir = self.work_dir + 'TempDiversity/'
+
+            #Path to gp120 assemblies fasta files
+            self.gp120_seq_dir = self.work_dir + 'Gp120Fasta/'
+
+            os.mkdir(self.work_dir)
+            os.mkdir(self.input_dir)
+            os.mkdir(self.output_dir)
+            os.mkdir(self.error_dir)
+            os.mkdir(self.smalt_out_dir)
+            os.mkdir(self.diversity_align_dir)
+            os.mkdir(self.gp120_seq_dir)
+
+            print "Working directory created"
+
+        except:
+            print "Exception in build working directory"
+
+#Create the working directory
+my_path_manager = PathManager()
+my_path_manager.BuildWorkDir()
+
+
 
 class StatComputer():
     """
@@ -88,9 +197,6 @@ class StatComputer():
 
         #Base directory for smalt output
         self.map_dir=map_dir
-
-        #TODO NOT USED
-        self.stat_dir=stat_dir
 
         #Base directory of consensus sequence for each specimen
         self.ref_dir=ref_dir
@@ -137,8 +243,6 @@ class StatComputer():
         Key => region
         Value => another dictionnary  Key => specimen
                                       Value => list of final stats
-
-
         :return:
         """
 
@@ -359,17 +463,17 @@ class StatComputer():
         and number of haplotypes 
         '''
         #stat_file=open('/home/ericfournier/ProjetPersonnel/ProjetsNGS/HIV/SlidingWindow/Results/stat_results.txt','w')
-        stat_file = open(PathManager.statfile_out,'w')
+        stat_file = open(my_path_manager.output_dir + 'StatResults.txt','w')
         # Header
         stat_file.write('Spec\tType\tRegion\tComplexity\tShannon\tDiversity\tNb_seq\tNb_haplotype\n')
 
         for region in self.all_stat:
             for spec in self.all_stat[region]:
                 if str(spec).startswith('CH'):
-                    #CHRONIC specimen
+                    #CHRONIC specimens
                     type='CHRONIC'
                 else:
-                    #RECENT specimen
+                    #RECENT specimens
                     type='RECENT'
 
                 stat_file.write(spec+'\t'+type+'\t'+region+'\t')
@@ -385,7 +489,7 @@ class StatComputer():
         Save the number of specimens contributing to each region
         '''
         #nbspec_per_region_file=open('/home/ericfournier/ProjetPersonnel/ProjetsNGS/HIV/SlidingWindow/Results/nb_spec_per_region.txt','w')
-        nbspec_per_region_file = open(PathManager.nspec_region_out, 'w')
+        nbspec_per_region_file = open(my_path_manager.output_dir + 'NbSpecPerRegion.txt','w')
 
         nbspec_per_region_file.write('Regions\tNb_specimen\n')
 
@@ -455,11 +559,11 @@ class StatComputer():
 
         #Path to the multi fasta file
         #fasta_read="/home/ericfournier/ProjetPersonnel/ProjetsNGS/HIV/SlidingWindow/ReadAlign/temp_read.fasta"
-        fasta_read = PathManager.seq_align_out
+        fasta_read = my_path_manager.diversity_align_dir + 'temp_read.fasta'
 
         #Compute diversity with the in-house R script ComputeDiversity.R
         #r_output=subprocess.check_output("Rscript /home/ericfournier/ProjetPersonnel/ProjetsNGS/HIV/SlidingWindow/RSCRIPT/ComputeDiversity.R "+fasta_read, shell=True)
-        r_output = subprocess.check_output("Rscript " + PathManager.diversity_script_in + " " +  fasta_read,shell=True)
+        r_output = subprocess.check_output("Rscript " + "ComputeDiversity.R" + " " + fasta_read, shell=True)
 
         #Extract the diversity value from the R output
         try:
@@ -467,13 +571,13 @@ class StatComputer():
 
         except:
             #with open("/home/ericfournier/ProjetPersonnel/ProjetsNGS/HIV/SlidingWindow/ERROR/error.txt",'a') as writef:
-            with open(PathManager.diversity_error_out,'a') as writef:
+            with open(my_path_manager.error_dir+'DiversityErrorLog','a') as writef:
                 writef.write('No diversity for '+spec+'\n')
             writef.close()
 
             #Keep a copy of the alignment if exception
             #os.system('cp /home/ericfournier/ProjetPersonnel/ProjetsNGS/HIV/SlidingWindow/ReadAlign/temp_read.fasta /home/ericfournier/ProjetPersonnel/ProjetsNGS/HIV/SlidingWindow/ReadAlign/'+'temp_read_'+spec+'_'+region+'.fasta')
-            os.system('cp ' + PathManager.seq_align_out + " " + PathManager.seq_align_error_out + 'temp_read_' + spec + '_' + region + '.fasta')
+            os.system('cp ' + fasta_read + " " + my_path_manager.error_dir + 'temp_read_' + spec + '_' + region + '.fasta')
             diversity='NA'
 
         os.system('rm '+fasta_read)
@@ -497,7 +601,7 @@ class StatComputer():
 
         #Create the corresponding multi fasta file
         #SeqIO.write(rec_list,"/home/ericfournier/ProjetPersonnel/ProjetsNGS/HIV/SlidingWindow/ReadAlign/temp_read.fasta","fasta")
-        SeqIO.write(rec_list,PathManager.seq_align_out,"fasta")
+        SeqIO.write(rec_list,my_path_manager.diversity_align_dir + 'temp_read.fasta', "fasta")
 
     def ComputeShannon(self,seq_list):
         """
@@ -759,13 +863,18 @@ class Mapper():
 
         #Path to smalt executable
         #self.smalt_prog='/home/ericfournier/ProgramInternet/SMALT/smalt-0.7.4/smalt_i686'
-        self.smalt_prog = PathManager.smalt_bin
+        self.smalt_prog = my_path_manager.smalt_bin
 
         #Path to paired end fastq; first and second set
-        #self.fastq_hiv3='/media/ericfournier/Elements/MiSeq/20160316_AlexVIH3/{0}/FASTQ/'
-        self.fastq_hiv3 = PathManager.fastq_1
-        #self.fastq_hiv4='/media/ericfournier/Elements/MiSeq/20160321_AlexVIH4/{0}/FASTQ/'
-        self.fastq_hiv4 = PathManager.fastq_2
+
+        #self.fastq_hiv1='/media/ericfournier/Elements/MiSeq/20160316_AlexVIH3/{0}/FASTQ/'
+        self.fastq_hiv1 = my_path_manager.fastq_1 + '{0}/FASTQ/'
+
+        #self.fastq_hiv2='/media/ericfournier/Elements/MiSeq/20160321_AlexVIH4/{0}/FASTQ/'
+        if self.fastq_hiv2 != None:
+            self.fastq_hiv2 = my_path_manager.fastq_2 + '{0}/FASTQ/'
+        else:
+            pass
 
         #For one specimen fastq paired end path
         self.fastq_pair=[]
@@ -805,11 +914,11 @@ class Mapper():
 
         #Find the fastq paired end path
         try:
-            for fastq in os.listdir(self.fastq_hiv3.format(spec)):
-                self.fastq_pair.append(self.fastq_hiv3.format(spec)+'/'+fastq)
+            for fastq in os.listdir(self.fastq_hiv1.format(spec)):
+                self.fastq_pair.append(self.fastq_hiv1.format(spec)+'/'+fastq)
         except:
-            for fastq in os.listdir(self.fastq_hiv4.format(spec)):
-                self.fastq_pair.append(self.fastq_hiv4.format(spec)+'/'+fastq)
+            for fastq in os.listdir(self.fastq_hiv2.format(spec)):
+                self.fastq_pair.append(self.fastq_hiv2.format(spec)+'/'+fastq)
 
     def Map(self,spec,index_file):
         """
@@ -838,6 +947,8 @@ class Mapper():
         #os.system('samtools calmd -e {0}{1}{2} {3}.fasta > {0}{1}.sam'.format(self.out_dir,spec,'_sort.bam ',index_file))
         #remove bam
         os.system('rm {0}{1} {0}{2}'.format(self.out_dir,spec+'.bam',spec+'_sort.bam'))
+
+        #for test only
         #os.system("samtools calmd -e {0}Smalt_{2}_sort.bam {0}{2}_cut.fasta > {1}{2}_sort_md.sam".format(self.in_dir,self.out_bam_dir,spec))
 
 class WindowAnalyser():
@@ -859,24 +970,18 @@ class WindowAnalyser():
 
         return
 
-        #TODO no more necessary : Base directory of global alignment
-        #self.base_dir_seq="/home/ericfournier/ProjetPersonnel/ProjetsNGS/HIV/SlidingWindow/GlobalAlignment/"
-
 
         #Base directory of consensus sequence for each specimen
         #self.base_dir_ref="/home/ericfournier/ProjetPersonnel/ProjetsNGS/HIV/SlidingWindow/TempReference/"
-        self.base_dir_ref = PathManager.gp120_fasta
+        self.base_dir_ref = my_path_manager.gp120_seq_dir
 
         #Base directory for smalt output
         #self.base_dir_map="/media/ericfournier/Elements/MiSeq/HIV_slidingwindow_map/"
-        self.base_dir_map = PathManager.smalt_out
-
-        #TODO NOT USED
-        #self.base_dir_stat= "/home/ericfournier/ProjetPersonnel/ProjetsNGS/HIV/SlidingWindow/StatRes/"
+        self.base_dir_map = my_path_manager.smalt_out_dir
 
         #Specimen list in yaml file
         #self.yam_file=open('/home/ericfournier/ProjetPersonnel/ProjetsNGS/HIV/SlidingWindow/HIV.yaml').read()
-        self.yam_file = PathManager.yaml_spec_in
+        self.yam_file = my_path_manager.yaml_spec_in
 
         #Number of specimen
         self.NbSpec=yaml.load(self.yam_file)[0]
@@ -889,7 +994,7 @@ class WindowAnalyser():
 
         #List of fasta record from global alignement
         #self.global_align_iter=SeqIO.parse(self.base_dir_seq+'GlobalHIVAlign_original.fas','fasta')
-        self.global_align_iter = PathManager.global_align_in
+        self.global_align_iter = my_path_manager.global_align_in
 
         #HXB2 record in fasta format
         ref_rec=self.global_align_iter.next()
@@ -979,3 +1084,5 @@ class WindowAnalyser():
 
 
 
+#Start the program
+my_wa=WindowAnalyser()
