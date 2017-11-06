@@ -68,9 +68,3 @@ heterogeneity in different pre-established region. Final output is a statistic f
 			|_ Gp120Fasta    => Used to store g120 sequences from each specimen in fasta format. Those sequences are extracted
                                             from the global alignement input.
 
-		
-|-| | \/
-
-	|-| | \/       |-| | \/
-
-                |-| | \/        
