@@ -69,4 +69,8 @@ heterogeneity in different pre-established region. Final output is a statistic f
                                             from the global alignement input.
 
 		
-               
+|-| | \/
+
+	|-| | \/       |-| | \/
+
+                |-| | \/        
