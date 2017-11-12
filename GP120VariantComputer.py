@@ -26,7 +26,6 @@ parser = argparse.ArgumentParser(prog="GP120VariantComputer",formatter_class=arg
             '''))
 
 
-#TODO ajouter / dans les path des base dir , confirmer le besoin dans le code
 
 parser.add_argument('--basedir',metavar='[Required : Path to base directory]',required=True,nargs=1)
 
@@ -45,7 +44,6 @@ parser.add_argument('--fastq-2',nargs=1,type=str,metavar='[Optional : Base direc
 args=parser.parse_args()
 
 
-#TODO SUPPRIMER LES PATH COMMENTé mais faire un check in avant
 
 class PathManager():
     """
