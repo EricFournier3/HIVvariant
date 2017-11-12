@@ -18,10 +18,13 @@ heterogeneity in different pre-established region. Final output is a statistic f
         -Linux operating system
 	-Python 2.7
         -The following Python modules; Bio, yaml, argparse, textwrap
+        -Smalt (http://www.sanger.ac.uk/science/tools/smalt-0)
+        -Samtools (http://samtools.sourceforge.net/)
+        -R with the following libraries; pegas, seqinr, msa, ggplot2
 
 2.2 Command line options
 
-	*To display help run 
+	*To display help, run 
          	python GP120VariantComputer.py --help
 
         *Required options are
@@ -39,7 +42,11 @@ heterogeneity in different pre-established region. Final output is a statistic f
 			Required. Path to Smalt executable
 
 		--fastq-1 <String>
-			Required. Path to fastq files
+			Required. Path to fastq files. In this directory, subdirectories must be structured as follow;
+                        
+                        <SpecimenID> 
+                             |_ <FASTQ>
+                                   |_ <Paired End fastq files>
 
 		--fastq-2 <String>
 			Optional. Path to extra fastq files
@@ -67,4 +74,5 @@ heterogeneity in different pre-established region. Final output is a statistic f
                         |                   for diversity calculation by ComputeDiversity.R
 			|_ Gp120Fasta    => Used to store g120 sequences from each specimen in fasta format. Those sequences are extracted
                                             from the global alignement input.
-
+     
+	To build distribution plots for Diversity, Complexity and Shannon entropy, run MakePlot.R. Please read instruction inside it.

@@ -12,6 +12,8 @@ import math
 import subprocess
 import argparse
 import textwrap
+import threading
+import time
 
 #Option parsing
 parser = argparse.ArgumentParser(prog="GP120VariantComputer",formatter_class=argparse.RawDescriptionHelpFormatter,description=textwrap.dedent('''\
@@ -28,9 +30,9 @@ parser = argparse.ArgumentParser(prog="GP120VariantComputer",formatter_class=arg
 
 parser.add_argument('--basedir',metavar='[Required : Path to base directory]',required=True,nargs=1)
 
-parser.add_argument('--global-align-in',type=argparse.FileType('r'),metavar='[Required : Path to global alignement]',required=True,nargs=1,dest='globalalignin')
+parser.add_argument('--global-align-in',type=str,metavar='[Required : Path to global alignement]',required=True,nargs=1,dest='globalalignin')
 
-parser.add_argument('--yaml-spec-in',type=argparse.FileType('r'),metavar='[Required : Path to yaml with specimens id]',required=True,nargs=1,dest='yamlspecin')
+parser.add_argument('--yaml-spec-in',type=str,metavar='[Required : Path to yaml with specimens id]',required=True,nargs=1,dest='yamlspecin')
 
 parser.add_argument('--smalt-bin',nargs=1,type=str,metavar='[Required : Path to Smalt executable]',required=True,dest='smaltbin')
 
@@ -38,52 +40,6 @@ parser.add_argument('--fastq-1',nargs=1,type=str,metavar='Required : Base direct
 
 #Optional
 parser.add_argument('--fastq-2',nargs=1,type=str,metavar='[Optional : Base directory for second optional set of fastq]',required=False,dest='fastq2')
-
-
-###########################################################################################################################
-
-#Write mode
-#no need
-#parser.add_argument('--statfile-out',type=str,metavar='[Output file for statistic]',required=True,nargs=1,dest='statfileout')
-
-#no need
-#parser.add_argument('--nspec-region-out',type=argparse.FileType('w'),metavar='[Output file for number of specimen per region]',required=True,nargs=1,dest='nspecregionout')
-
-#no need
-#parser.add_argument('--seq-align-out',type=argparse.FileType('w'),metavar='[Output fasta file for diversity calculation]',required=True,nargs=1,dest='seqalignout')
-#parser.add_argument('--diversity-error-out',type=argparse.FileType('w'),metavar='[Output file to log diversity calculation error]',required=True,nargs=1,dest='diversityerrorout')
-
-#Read mode
-
-#no need
-#parser.add_argument('--diversity-script-in',type=argparse.FileType('r'),metavar='[Path to ComputeDiversity.R]',required=True,nargs=1,dest='diversityscriptin')
-
-#need
-#parser.add_argument('--global-align-in',type=argparse.FileType('r'),metavar='[Path to global alignement]',required=True,nargs=1,dest='globalalignin')
-
-#need
-#parser.add_argument('--yaml-spec-in',type=argparse.FileType('r'),metavar='[Path to yaml with specimens id]',required=True,nargs=1,dest='yamlspecin')
-
-#Base directory
-
-#need
-#parser.add_argument('--smalt-bin',nargs=1,type=str,metavar='[Path to Smalt executable]',required=True,dest='smaltbin')
-
-
-#need
-#parser.add_argument('--fastq-1',nargs=1,type=str,metavar='[Base directory for first set of fastq]',required=True,dest='fastq1')
-
-#need
-#parser.add_argument('--fastq-2',nargs=1,type=str,metavar='[Base directory for second set of fastq]',required=True,dest='fastq2')
-
-#no need
-#parser.add_argument('--gp120-fasta',nargs=1,type=str,metavar='[Base directory for gp120 fasta contig file]',required=True,dest='gp120fasta')
-
-#no need
-#parser.add_argument('--smalt-out',nargs=1,type=str,metavar='[Base directory for smalt bam and sam output file]',dest='smaltout')
-
-#no need
-#parser.add_argument('--seq-align-error-out',type=str,metavar='[Base directory to save fasta alignment files with diversity calculation error]',required=True,nargs=1,dest='seqalignerrorout')
 
 
 args=parser.parse_args()
@@ -187,7 +143,7 @@ class StatComputer():
     Class used to compute mapping statistic.
     """
 
-    def __init__(self,map_dir,stat_dir,ref_dir,dna_regions,region_length_inref):
+    def __init__(self,map_dir,ref_dir,dna_regions,region_length_inref):
 
         #Length of each region in HXB2
         self.region_length_inref=region_length_inref
@@ -871,7 +827,7 @@ class Mapper():
         self.fastq_hiv1 = my_path_manager.fastq_1 + '{0}/FASTQ/'
 
         #self.fastq_hiv2='/media/ericfournier/Elements/MiSeq/20160321_AlexVIH4/{0}/FASTQ/'
-        if self.fastq_hiv2 != None:
+        if my_path_manager.fastq_2 != None:
             self.fastq_hiv2 = my_path_manager.fastq_2 + '{0}/FASTQ/'
         else:
             pass
@@ -898,7 +854,7 @@ class Mapper():
         index_file_prefix=re.sub(r'\.fasta','',fasta_file)
 
         #Execute indexing
-        os.system(self.smalt_prog +'index'+self.param_k+self.param_s+index_file_prefix+' '+fasta_file)
+        os.system(self.smalt_prog +' index '+self.param_k+self.param_s+index_file_prefix+' '+fasta_file)
 
     def FindFastqPair(self,spec):
         """
@@ -917,6 +873,7 @@ class Mapper():
             for fastq in os.listdir(self.fastq_hiv1.format(spec)):
                 self.fastq_pair.append(self.fastq_hiv1.format(spec)+'/'+fastq)
         except:
+            print "IN EXCEPT"
             for fastq in os.listdir(self.fastq_hiv2.format(spec)):
                 self.fastq_pair.append(self.fastq_hiv2.format(spec)+'/'+fastq)
 
@@ -955,6 +912,20 @@ class WindowAnalyser():
 
     def __init__(self):
 
+        #flag for program status
+        self.finish = False
+
+        print "This process has the pid", os.getpid()
+
+        #Display wait message during program execution
+        try:
+            t = threading.Thread(target=self.WaitMessage)
+            t.start()
+        except:
+            print "Error: unable to start thread"
+            #End program
+            exit(0)
+
         #Specimen list
         self.spec_list=[]
 
@@ -968,9 +939,6 @@ class WindowAnalyser():
         self.gp120_region={'v1':(415,495),'v2':(496,642),'c2_1':(643,742),'c2_2':(743,842),'c2_3':(843,954),'v3':(955,1071),'c3_1':(1072,1173),
         'c3_2':(1174,1276),'v4':(1277,1388),'c4':(1389,1481),'v5':(1482,1547),'c5':(1548,1700),'NHR':(1701,1860)}
 
-        return
-
-
         #Base directory of consensus sequence for each specimen
         #self.base_dir_ref="/home/ericfournier/ProjetPersonnel/ProjetsNGS/HIV/SlidingWindow/TempReference/"
         self.base_dir_ref = my_path_manager.gp120_seq_dir
@@ -981,7 +949,7 @@ class WindowAnalyser():
 
         #Specimen list in yaml file
         #self.yam_file=open('/home/ericfournier/ProjetPersonnel/ProjetsNGS/HIV/SlidingWindow/HIV.yaml').read()
-        self.yam_file = my_path_manager.yaml_spec_in
+        self.yam_file = open(my_path_manager.yaml_spec_in).read()
 
         #Number of specimen
         self.NbSpec=yaml.load(self.yam_file)[0]
@@ -994,7 +962,7 @@ class WindowAnalyser():
 
         #List of fasta record from global alignement
         #self.global_align_iter=SeqIO.parse(self.base_dir_seq+'GlobalHIVAlign_original.fas','fasta')
-        self.global_align_iter = my_path_manager.global_align_in
+        self.global_align_iter = SeqIO.parse(my_path_manager.global_align_in,'fasta')
 
         #HXB2 record in fasta format
         ref_rec=self.global_align_iter.next()
@@ -1003,11 +971,32 @@ class WindowAnalyser():
 
         self.mapper=Mapper(self.base_dir_map)
 
-        self.stat_comput=StatComputer(self.base_dir_map,self.base_dir_stat,self.base_dir_ref,self.gp120_region,self.gp120_region_length_inref)
+        self.stat_comput=StatComputer(self.base_dir_map,self.base_dir_ref,self.gp120_region,self.gp120_region_length_inref)
 
+
+        print " *********  Start Analysis **********"
         self.StartAnalysis()
 
+
+
+        print " *********  Save Statistics **********"
         self.SaveStat()
+
+        #program has ended
+        self.finish = True
+
+        return
+
+    def WaitMessage(self):
+        """
+        Printout during program execution
+        :param delay:
+        :return:
+        """
+        while not self.finish:
+            time.sleep(30)
+            print "%s: %s" % ("Please wait", time.ctime(time.time()))
+
 
     def ComputeRegionLength(self,ref_rec):
         """
@@ -1044,6 +1033,9 @@ class WindowAnalyser():
             self.CreateOneSpecFasta(my_rec)
             self.mapper.IndexRef(self.base_dir_ref+my_rec.id+'.fasta')
             self.mapper.FindFastqPair(my_rec.id)
+
+            print "Mapping step for " + my_rec.id
+
             self.mapper.Map(my_rec.id,self.base_dir_ref+my_rec.id)
 
             self.stat_comput.CreateGapCountDict(my_rec)
@@ -1081,8 +1073,12 @@ class WindowAnalyser():
         SeqIO.write(rec,'{1}{0}.fasta'.format(rec.id,self.base_dir_ref),'fasta')
 
 
-
-
-
 #Start the program
 my_wa=WindowAnalyser()
+
+'''
+Command Example
+python GP120VariantComputer.py --basedir '/home/eric/ProjetPersonnel/ProjetsNGS/HIV/SlidingWindow/TestGitCode' --global-align-in '/home/eric/ProjetPersonnel/ProjetsNGS/HIV/SlidingWindow/TestGitCode/Alignment/Alignement.fas' --yaml-spec-in '/home/eric/ProjetPersonnel/ProjetsNGS/HIV/SlidingWindow/TestGitCode/SpecList/ExampleSpecYaml.yaml' --smalt-bin '/home/eric/InternetProgram/Smalt/smalt-0.7.4/smalt_i686' --fastq-1 '/media/eric/Elements/MiSeq/20160316_AlexVIH3'
+
+
+'''
