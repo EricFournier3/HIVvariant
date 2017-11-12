@@ -9,12 +9,11 @@ Current contributor:
 
 1. About
 
-This script use as input deep sequencing reads from the HIV gp120 envelpe generated from chronic/recent patient isolates and their corresponding consensus dna sequence. For each specimen, reads are mapped to their respective consensus gp120 sequence in order to measure the level of
-heterogeneity in different pre-established region. Final output is a statistic file compatible with R. Comparison between regions and chronic versus recent isolates can be made based on nucleotidic diversity, complexity and normalized Shannon entropy.
+This script use as input deep sequencing reads from the HIV gp120 envelope generated from chronic/recent patient isolates and their corresponding consensus dna sequence. For each specimen, reads are mapped to their respective consensus gp120 sequence in order to measure the level of heterogeneity in different pre-established regions. Final output is a statistic file compatible with R. Comparison between regions and chronic versus recent isolates can be made based on nucleotidic diversity, complexity and normalized Shannon entropy.
 
 2. Running GP120VariantComputer
 
-2.1 Dependencies
+   2.1 Dependencies
         -Linux operating system
 	-Python 2.7
         -The following Python modules; Bio, yaml, argparse, textwrap
@@ -22,7 +21,7 @@ heterogeneity in different pre-established region. Final output is a statistic f
         -Samtools (http://samtools.sourceforge.net/)
         -R with the following libraries; pegas, seqinr, msa, ggplot2
 
-2.2 Command line options
+   2.2 Command line options
 
 	*To display help, run 
          	python GP120VariantComputer.py --help
@@ -51,17 +50,17 @@ heterogeneity in different pre-established region. Final output is a statistic f
 		--fastq-2 <String>
 			Optional. Path to extra fastq files
 
-2.3 Input
+   2.3 Input
 
 	User must specify path to the following input files :
 
-			- A global dna gp120 alignement of specimens sequence with HXG2 as reference in fasta format.
+			- A global dna gp120 alignement of specimens sequences with HXB2 as reference in fasta format.
 
-			- A specimen list in yaml format. See ExampleSpecYaml.yaml as example.
+			- A specimens list in yaml format. See ExampleSpecYaml.yaml as example.
 
 			- Paired end fastq files (uncompressed or gz compressed). Two different path are accepted.  
 
-2.4 Output
+   2.4 Output
 
 	The following directory scaffold is automatically created when the script is launched.
 
