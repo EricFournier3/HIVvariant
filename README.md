@@ -4,7 +4,7 @@ Developped at the Laboratoire de santé publique du Québec, Canada, Qc
 
 Current contributor:
 
-	Eric Fournier
+	- Eric Fournier
 
 
 1. About
